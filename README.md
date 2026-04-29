@@ -1,4 +1,4 @@
-# Segundo Laboratorio – Procedimiento y Desarrollo (Para agregar al README de GitHub)
+# Segundo Laboratorio 
 
 ## Procedimiento del desarrollo del laboratorio
 
