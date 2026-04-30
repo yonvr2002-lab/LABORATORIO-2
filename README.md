@@ -59,6 +59,7 @@ switchport mode access
 switchport access vlan 20
 ```
 <img width="538" height="489" alt="image" src="https://github.com/user-attachments/assets/3e51eb0c-0bbe-41e9-a06a-94642ca05935" />
+
 ### Configuración del puerto trunk
 
 ```cisco
@@ -67,6 +68,7 @@ switchport mode trunk
 switchport trunk allowed vlan 10,20
 ```
 <img width="538" height="489" alt="image" src="https://github.com/user-attachments/assets/3e51eb0c-0bbe-41e9-a06a-94642ca05935" />
+
 ### Configuración SPAN
 
 ```cisco
