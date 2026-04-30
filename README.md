@@ -46,6 +46,7 @@ name SUBRED2
 exit
 ```
 
+
 ### Asignación de puertos
 
 ```cisco
@@ -57,7 +58,7 @@ interface range fa0/13-22
 switchport mode access
 switchport access vlan 20
 ```
-
+<img width="538" height="489" alt="image" src="https://github.com/user-attachments/assets/3e51eb0c-0bbe-41e9-a06a-94642ca05935" />
 ### Configuración del puerto trunk
 
 ```cisco
@@ -65,7 +66,7 @@ interface g0/24
 switchport mode trunk
 switchport trunk allowed vlan 10,20
 ```
-
+<img width="538" height="489" alt="image" src="https://github.com/user-attachments/assets/3e51eb0c-0bbe-41e9-a06a-94642ca05935" />
 ### Configuración SPAN
 
 ```cisco
@@ -73,6 +74,7 @@ monitor session 1 source vlan 10
 monitor session 1 source vlan 20
 monitor session 1 destination interface g0/23
 ```
+<img width="502" height="600" alt="image" src="https://github.com/user-attachments/assets/6afbbcdc-2b79-4fe9-a216-7639802509e5" />
 
 Con esto todo el tráfico de ambas VLAN fue replicado hacia la interfaz de captura.
 
