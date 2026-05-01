@@ -203,6 +203,7 @@ Importación del esquema:
 ```bash
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql -u root -p zabbix
 ```
+<img width="1007" height="564" alt="image" src="https://github.com/user-attachments/assets/a7c8718d-0cc4-48d4-bf46-8997c7c141b3" />
 
 Inicio servicios:
 
@@ -210,6 +211,7 @@ Inicio servicios:
 sudo systemctl enable zabbix-server
 sudo systemctl start zabbix-server
 ```
+<img width="865" height="541" alt="image" src="https://github.com/user-attachments/assets/2516e2d9-8305-4ef4-8a01-9cdbe18746db" />
 
 Se añadieron hosts de ambas VLAN para monitorear:
 
