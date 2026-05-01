@@ -3,10 +3,13 @@
 ## Procedimiento del desarrollo del laboratorio
 
 ## 1. Planeación e implementación de la arquitectura
+<img width="797" height="1028" alt="image" src="https://github.com/user-attachments/assets/62a2b58f-8362-4e93-8d99-3bbf3302237a" />
 
 Para el desarrollo del laboratorio se inició con el diseño de una arquitectura segmentada en dos subredes, administradas desde una máquina virtual principal con Debian, la cual cumple funciones de monitoreo, visualización, análisis de tráfico y administración general.
 
 ### 1.1 Configuración del nodo administrador
+### Tabla de instancias creadas:
+<img width="1352" height="366" alt="image" src="https://github.com/user-attachments/assets/d00c9597-9678-49e8-bc50-65f4ef78adef" />
 
 Se creó una máquina virtual con Debian y se configuraron tres interfaces de red:
 
@@ -104,8 +107,13 @@ sudo ip link set eth1.20 up
 ```bash
 echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 ```
+<img width="1118" height="810" alt="image" src="https://github.com/user-attachments/assets/66de19e8-f7f1-40c0-a816-e95641569335" />
 
 Esto permitió comunicación entre subredes.
+
+### Reglas del Security group
+
+<img width="1231" height="516" alt="image" src="https://github.com/user-attachments/assets/af786a7d-ff06-4265-a2da-1a0f36e7bebf" />
 
 ---
 
@@ -230,6 +238,7 @@ Acceso:
 ```bash
 http://localhost:3000
 ```
+<img width="1374" height="646" alt="image" src="https://github.com/user-attachments/assets/40b2ec32-3f03-49cc-bce3-41abe43a1676" />
 
 Se agregaron dos fuentes de datos:
 
@@ -255,6 +264,8 @@ Se construyó un dashboard con:
 ---
 
 # 8. Generación de tráfico con iPerf3
+
+<img width="1018" height="759" alt="image" src="https://github.com/user-attachments/assets/4fb2baba-7d24-4f1a-b738-523882d3efb6" />
 
 ## Servidor
 
@@ -286,6 +297,8 @@ Con esto se observó cómo los flujos aparecían en Grafana y en las capturas.
 ---
 
 # 9. Captura y análisis con Wireshark
+
+<img width="1336" height="928" alt="image" src="https://github.com/user-attachments/assets/144eae4d-59f8-43d5-bd6d-541b656853bf" />
 
 Captura:
 
@@ -335,6 +348,8 @@ Wireshark permitió:
 * Correlacionar congestión con desempeño.
 
 Cuando se ejecuta iPerf se generan grandes volúmenes de tráfico que permiten medir rendimiento, y estos se reflejan tanto en flujos exportados como en capturas.
+### Conexion SSH de cada instancia
+<img width="1363" height="634" alt="image" src="https://github.com/user-attachments/assets/26878439-a043-4584-b0c6-cc13b6b5b167" />
 
 ---
 
@@ -387,6 +402,9 @@ Gateway: 192.168.1.1
 
 Se creó entorno virtual:
 
+<img width="1298" height="550" alt="image" src="https://github.com/user-attachments/assets/1e8bfa87-03ec-4a7a-ad9d-65a981a556cd" />
+
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -409,6 +427,9 @@ El script permitió detectar objetos y correlacionar FPS con tráfico capturado.
 ---
 
 ## 13. Pruebas de rendimiento con iPerf3
+
+<img width="1278" height="521" alt="image" src="https://github.com/user-attachments/assets/706ca812-f372-4883-b867-ac3289d61fa3" />
+
 
 Servidor:
 
@@ -515,5 +536,22 @@ Durante el procedimiento se logró:
 5. Generar pruebas de carga con iPerf3.
 6. Relacionar visión computacional y teletráfico mediante YOLO.
 7. Validar comportamiento de red en entornos virtualizados y físicos.
+----
+## Preguntas del laboratorio
+### Describir paso a paso el desarrollo de la arquitectura y su conformación.
+
+La arquitectura se implementó en dos capas. En AWS se desplegaron 4 instancias EC2 dentro de una VPC con dos subnets que simulan las VLAN 10 (10.0.10.0/24) y VLAN 20 (10.0.20.0/24). La VM Admin (Debian, t3.small) actúa como nodo central con Grafana, Zabbix y pmacct. En la máquina local se ejecutaron 3 contenedores Docker (Fedora, Alpine, Kali Linux) y un switch Cisco 2960 simulado en GNS3 con VLANs, puerto trunk y puerto SPAN. Ambas capas se interconectan mediante un túnel WireGuard (UDP 51820), permitiendo que los contenedores locales se comuniquen con las VMs de AWS como si estuvieran en la misma red. El flujo de monitoreo es: tráfico → SPAN → softflowd/pmacct → NetFlow → MariaDB → Grafana.
+
+### ¿Cuál es la relevancia en el proyecto de NetFlow, sFlow e IPFIX?
+
+NetFlow (creado por Cisco) exporta registros de flujos IP con información de origen, destino, protocolo, puertos y bytes transferidos. sFlow usa muestreo estadístico de paquetes en tiempo real, ideal para redes de alta velocidad. IPFIX es el estándar abierto basado en NetFlow v9 que permite exportar metadatos flexibles. En este laboratorio, pmacct recolecta los tres protocolos simultáneamente (puertos 2055, 6343 y 4739), almacena los flujos en MariaDB y Grafana los visualiza. Esto permite al administrador ver en tiempo real quién habla con quién, cuánto tráfico genera cada host y detectar anomalías, sin necesidad de capturar paquetes completos como hace Wireshark.
+
+###  ¿Qué se obtiene con Wireshark? ¿Qué pasa cuando se ejecuta iPerf?
+
+Wireshark captura y decodifica paquetes en tiempo real mostrando la jerarquía de protocolos (Ethernet → IP → TCP/UDP → RTSP/RTP). Con el flujo de video activo se observan: mensajes RTSP en puerto 554 TCP (OPTIONS, DESCRIBE, SETUP, PLAY, TEARDOWN) para la señalización, y paquetes RTP en puertos UDP altos para el transporte real del video con número de secuencia y timestamp. Cuando se activa iPerf3, el ancho de banda disponible disminuye: en modo TCP se observa el mecanismo de ventana deslizante (control de flujo) expandiéndose y contrayéndose; en modo UDP no hay control de flujo y aparece pérdida de paquetes RTP medible en Wireshark como gaps en los números de secuencia, lo que degrada directamente los FPS de YOLO.
+
+### ¿Cuáles son las diferencias entre máquinas virtuales y contenedores al instalar los sistemas operativos?
+
+Las máquinas virtuales (Arch, Rocky, Ubuntu, Debian en AWS) requieren una imagen de disco completa con kernel propio, bootloader y todos los servicios del sistema. Su arranque toma 20-60 segundos y consumen varios GB de RAM independientemente de lo que ejecuten. Los contenedores Docker (Fedora, Alpine, Kali) comparten el kernel del host, solo incluyen las librerías de usuario necesarias y arrancan en menos de 1 segundo. Alpine ocupa apenas 5MB de imagen base versus los varios GB de una VM. La diferencia práctica en el laboratorio fue notoria: las VMs en AWS tardaron varios minutos en estar operativas mientras los contenedores Docker locales estuvieron listos instantáneamente. El aislamiento de las VMs es completo (hardware virtualizado), mientras los contenedores comparten el kernel pero tienen namespaces de red, proceso y filesystem separados.
 
 El laboratorio permitió correlacionar conceptos de conmutación, monitoreo, teletráfico, análisis de paquetes y calidad de servicio en una única solución integrada.
